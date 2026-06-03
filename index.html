@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiniela Treebolito - Pronostica y Gana</title>
+    <meta name="description" content="Participa en la Quiniela Treebolito. Pronostica los resultados de la Liga MX y LaLiga. ¡Gana el acumulado!">
+    <meta name="keywords" content="quiniela, pronosticos, liga mx, Laliga, apuestas, futbol">
+    <meta name="author" content="Quiniela Treebolito">
+    <meta name="robots" content="index, follow">
+
+    <link rel="icon" type="image/png" href="img/logo.png" sizes="32x32">
+    <link rel="apple-touch-icon" href="img/logo.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="img/logo.png" alt="Treebolito" class="logo-img">
+                <img src="img/IMG3.png" alt="Quiniela Treebolito" class="logo-text-img">
+            </div>
+            
+            <nav class="nav">
+                <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+                <ul class="nav-list" id="navList">
+                    <li><a href="#quiniela">Quiniela</a></li>
+                    <li><a href="reglas.html">Reglas</a></li>
+                    <li><a href="#" onclick="mostrarDatosPago();return false">Pago</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">🎯 Quiniela Treebolito</div>
+            <div class="hero-titulo">
+                <img src="img/IMG33.png" alt="Quiniela Treebolito" class="hero-title-img">
+            </div>
+            <p class="hero-subtitle">Pronostica los resultados y ganas el acumulado</p>
+            <a href="app/Quiniela-treebolito.apk" download onclick="mostrarInstruccionesApp();return false" class="app-download-banner">
+                📱 Descarga nuestra App Oficial - Disponible para Android
+            </a>
+        </div>
+    </section>
+
+    <div class="premio-acumulado">
+        <div class="acumulado-card">
+            <span class="acumulado-label">👥 Participantes</span>
+            <span class="acumulado-monto" id="participantesMonto">0</span>
+            <span class="acumulado-info">quinielas confirmadas</span>
+        </div>
+        <div class="acumulado-card">
+            <span class="acumulado-label">💰 Acumulado</span>
+            <span class="acumulado-monto" id="acumuladoMonto">$0</span>
+            <span class="acumulado-info">premio total</span>
+        </div>
+        <div class="buscar-quiniela-card">
+            <span style="color:#f59e0b;font-weight:bold;font-size:0.85rem;width:100%;text-align:center;margin-bottom:0.25rem">Revisa tus pronósticos</span>
+            <div id="lideresActuales" style="display:none;background:linear-gradient(135deg,#1a1a2e,#0f0f1a);padding:0.75rem;border-radius:10px;margin-bottom:0.75rem;border:1px solid #22c55e">
+                <p style="margin:0;font-size:0.75rem;color:#aaa;text-align:center">🏆 LÍDER(ES) ACTUAL(ES)</p>
+                <p id="lideresNombres" style="margin:0.25rem 0;font-size:0.95rem;font-weight:bold;color:#22c55e;text-align:center"></p>
+                <p id="lideresAciertos" style="margin:0;font-size:0.8rem;color:#f59e0b;text-align:center"></p>
+            </div>
+            <input type="text" id="buscarIdInput" placeholder="ID o Teléfono (10 dígitos)" style="padding:0.5rem;border-radius:8px;border:2px solid var(--gray-300);background:var(--bg-dark);color:var(--text-primary);width:150px">
+            <button onclick="buscarQuinielaPorId()" style="background:#f59e0b;border:none;color:#000;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-weight:bold">🔍</button>
+        </div>
+    </div>
+
+    <div class="ultimos-participantes" id="ultimosParticipantes" style="background:#000000;border-radius:var(--radius-lg);padding:1rem;margin:1rem auto;max-width:600px;border:2px solid #f59e0b">
+        <h4 style="color:#3b82f6;margin-bottom:0.5rem">👥 Últimos participantes</h4>
+        <div id="listaUltimosParticipantes" style="display:grid;gap:0.5rem"></div>
+    </div>
+
+    <div id="descargarPdfContainer" style="display:none;text-align:center;margin:1rem">
+        <button onclick="descargarPronosticosPDF()" style="background:#22c55e;border:none;color:#fff;padding:0.75rem 1.5rem;border-radius:10px;cursor:pointer;font-weight:bold;font-size:1rem">📥 Descargar Pronósticos (PDF)</button>
+    </div>
+
+    <section class="quiniela-section" id="quiniela">
+        <div class="container">
+            <div class="quiniela-layout">
+                <div class="quiniela-sidebar resultados-sidebar">
+                    <div class="resultados-panel">
+                        <div class="resultados-titulo">📊 Resultados anteriores</div>
+                        <div class="resultados-grid" id="resultadosGrid">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiniela-main">
+
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-label">
+                            <span>Pronósticos seleccionados</span>
+                            <span class="progress-text"><span id="progressCount">0</span>/10</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+
+                    <div class="quiniela-seleccion">
+                        <span class="seleccion-label">Tu quiniela:</span>
+                        <div class="seleccion-resultados" id="seleccionResultados">
+                            <span class="resultado-vacio">Selecciona o genera una quiniela</span>
+                        </div>
+                    </div>
+
+                    <button id="btnGenerar" class="btn btn-purple">🎲 Generar Quiniela Aleatoria</button>
+
+                    <div id="mensajeRegistroBloqueado" style="display:none;background:#dc2626;color:#fff;padding:1rem;border-radius:10px;text-align:center;margin:0.5rem 0;font-weight:bold">
+                        ⛔ TIEMPO DE REGISTRO AGOTADO
+                    </div>
+
+                    <p style="color:#ef4444;font-weight:bold;text-align:center;margin:0.5rem 0;font-size:0.9rem">⚠️ ANTES DE PARTICIPAR LEE CON ATENCIÓN LAS REGLAS</p>
+                    <p style="color:#f59e0b;font-weight:bold;text-align:center;margin:0.5rem 0;font-size:0.85rem">⏰ EL REGISTRO SE CIERRA 1 HORA APROX. ANTES DEL PRIMER PARTIDO</p>
+
+                    <div class="partidos-panel">
+                        <h2 class="section-title">📋 Partidos de la Semana</h2>
+                        <div class="partidos-grid" id="partidosGrid">
+                            <div class="partido" data-index="0">
+                                <div class="partido-num">1</div>
+                                <span class="equipo-local" id="local0" onclick="seleccionarDesdeEquipo(0, 'L')">Cargar...</span>
+                                <div class="partido-opciones">
+                                    <button class="opcion" data-partido="0" data-opcion="E" onclick="seleccionarDesdeEquipo(0, 'E')">E</button>
+                                </div>
+                                <span class="equipo-visita" id="visita0" onclick="seleccionarDesdeEquipo(0, 'V')">Cargar...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btnConfirmar" class="btn btn-green btn-confirmar">✅ Confirmar Quiniela - $30 MXN</button>
+                </div>
+
+                <div class="quiniela-sidebar">
+                    <div class="ganador-panel">
+                        <div class="ganador-titulo">🏆 Último Ganador(es)</div>
+                        <div id="ganadoresContainer"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <div class="modal" id="compraModal">
+        <div class="modal-content">
+            <div class="modal-glow"></div>
+            <button class="modal-close" id="modalClose">✕</button>
+
+            <!-- Wizard Header -->
+            <div class="wizard-header" id="wizardHeader">
+                <div class="wizard-step active" data-step="1"><span class="step-number">1</span><span class="step-label">Resumen</span></div>
+                <div class="wizard-step" data-step="2"><span class="step-number">2</span><span class="step-label">Datos</span></div>
+                <div class="wizard-step" data-step="3"><span class="step-number">3</span><span class="step-label">Pago</span></div>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- PASO 1: Resumen -->
+                <div class="wizard-step-content active" id="step1">
+                    <div class="modal-icon">🎯</div>
+                    <h3 style="text-align:center;font-size:1.5rem;margin-bottom:0.5rem;color:#22c55e">Tu Quiniela</h3>
+                    <p style="text-align:center;color:var(--text-secondary);margin-bottom:1.5rem">Revisa tus pronósticos</p>
+
+                    <div class="compra-numeros">
+                        <p class="numeros-label">Tus pronósticos:</p>
+                        <div class="numeros-seleccion" id="quinielaSeleccion"></div>
+                    </div>
+
+                    <div class="compra-total">
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <span style="font-size:1.1rem">Total a pagar:</span>
+                            <span class="total-amount">$30 MXN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 2: Datos Cliente -->
+                <div class="wizard-step-content" id="step2">
+                    <div class="modal-icon">👤</div>
+                    <h3 style="text-align:center;font-size:1.5rem;margin-bottom:0.5rem;color:#22c55e">Tu Información</h3>
+                    <p style="text-align:center;color:var(--text-secondary);margin-bottom:1.5rem">Necesitamos tus datos para CONTACTARTE si llegas a ser ganador.</p>
+
+                    <div class="datos-cliente">
+                        <p class="datos-label">Datos del participante (obligatorios)</p>
+                        <div class="datos-campos">
+                            <input type="text" id="clienteNombre" class="cliente-input" placeholder="Tu nombre completo" required aria-label="Nombre completo">
+                            <input type="tel" id="clienteWhatsapp" class="cliente-input" placeholder="Número de WhatsApp (10 dígitos)" pattern="[0-9]{10}" required aria-label="Número de WhatsApp">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 3: Confirmación y Pago -->
+                <div class="wizard-step-content" id="step3">
+                    <div class="modal-icon">💳</div>
+                    <h3 style="text-align:center;font-size:1.5rem;margin-bottom:0.5rem;color:#22c55e">Datos de Pago</h3>
+                    <p style="text-align:center;color:var(--text-secondary);margin-bottom:1.5rem">Realiza tu pago y confirma por WhatsApp</p>
+
+                    <div class="pago-info">
+                        <div class="pago-datos">
+                            <div class="pago-dato">
+                                <span class="dato-label">CLABE</span>
+                                <span class="dato-value" id="clabeValue">722969010056604160</span>
+                                <span style="font-size:0.8rem;color:var(--text-secondary)">(JL Molina)</span>
+                                <button class="copy-btn" id="copyClabe" title="Copiar CLABE">📋</button>
+                            </div>
+                            <div class="pago-dato">
+                                <span class="dato-label">WhatsApp</span>
+                                <a href="https://wa.me/524741482078" target="_blank" class="whatsapp-link">4741482078</a>
+                                <button class="copy-btn" id="copyWhatsapp" title="Copiar WhatsApp">📋</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pago-instrucciones">
+                        <p>📱 <strong>¿Qué sigue?</strong></p>
+                        <ol>
+                            <li>Realiza la transferencia de <strong>$30 MXN</strong></li>
+                            <li>En la referencia pon tu <strong>ID de quiniela</strong></li>
+                            <li>Envía el comprobante por <strong>WhatsApp</strong></li>
+                            <li>¡Recibe tu confirmación!</li>
+                        </ol>
+                    </div>
+
+                    <div class="compra-aviso">
+                        <p><strong>⏰ Tiempo restante para pagar:</strong> <span class="countdown-timer">24h 0m 0s</span></p>
+                        <p>Pasado ese tiempo, tu quiniela se cancelará.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer" id="modalFooter">
+                <button type="button" class="btn btn-secondary" id="cancelarCompra">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnWizardNext" onclick="wizardNextStep()">Siguiente</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="successModal">
+        <div class="modal-content success-content">
+            <div class="modal-glow"></div>
+            <div class="success-icon">🎉</div>
+            <h3 style="font-size:1.8rem;margin-bottom:0.5rem">¡Quiniela Apartada!</h3>
+            <p style="font-size:1.1rem;margin-bottom:1rem">Tu pronóstico ha sido registrado.</p>
+            <div style="background:var(--gray-100);padding:1rem;border-radius:10px;margin:1rem 0;text-align:center">
+                <p style="margin-bottom:0.5rem;color:var(--text-secondary)">ID:</p>
+                <p style="font-size:1.5rem;font-weight:bold;color:#f59e0b" id="successId"></p>
+            </div>
+            <div style="background:var(--gray-100);padding:1rem;border-radius:10px;margin:1rem 0;text-align:center">
+                <p style="margin-bottom:0.5rem;color:var(--text-secondary)">Datos de Depósito</p>
+                <p style="margin-bottom:0.25rem;color:var(--text-secondary)">Banco:</p>
+                <p style="font-size:1.1rem;font-weight:bold">Mercado Libre</p>
+                <p style="margin-bottom:0.25rem;color:var(--text-secondary);margin-top:0.5rem">CLABE:</p>
+                <p style="font-size:1.3rem;font-weight:bold">722969010056604160</p>
+                <p style="font-size:0.8rem;color:var(--text-secondary)">(JL Molina)</p>
+                <button onclick="navigator.clipboard.writeText('722969010056604160')" style="background:#22c55e;border:none;color:#fff;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;margin-top:0.5rem;font-size:0.9rem">📋 Copiar CLABE</button>
+            </div>
+            <div style="background:var(--gray-100);padding:1rem;border-radius:10px;margin:1rem 0;text-align:center">
+                <p style="margin-bottom:0.5rem;color:var(--text-secondary)">Tus pronósticos:</p>
+                <div id="successPronosticos" style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem"></div>
+            </div>
+            <p class="success-instrucciones" style="color:#ef4444">📱 <strong>Próximo paso:</strong> Envía tus pronósticos e ID, haz tu depósito al número de cuenta y después de pagar mándanos tu comprobante de pago por WhatsApp antes de 24 horas</p>
+            <p style="color:#f59e0b;font-weight:bold;text-align:center;margin:0.5rem 0;font-size:0.85rem">⚠️ ADVERTENCIA: Una vez presionado el botón de WhatsApp tu quiniela quedará registrada en espera del pago para ser confirmada</p>
+            <button onclick="enviarWhatsApp()" class="btn-whatsapp">
+                <svg viewBox="0 0 24 24" class="whatsapp-icon"><path fill="white" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>                Enviar Comprobante
+            </button>
+            <button class="btn btn-secondary" id="closeSuccess">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="modal" id="depositoModal">
+        <div class="modal-content success-content">
+            <div class="modal-glow"></div>
+            <div class="success-icon">💳</div>
+            <h3 style="font-size:1.8rem;margin-bottom:0.5rem">Datos de Depósito</h3>
+            <p style="font-size:1.1rem;margin-bottom:1rem">Realiza tu depósito y envía tu captura</p>
+            <div style="background:var(--gray-100);padding:1rem;border-radius:10px;margin:1rem 0;text-align:center">
+                <p style="margin-bottom:0.5rem;color:var(--text-secondary)">Banco:</p>
+                <p style="font-size:1.3rem;font-weight:bold">Mercado Libre</p>
+            </div>
+            <div style="background:var(--gray-100);padding:1rem;border-radius:10px;margin:1rem 0;text-align:center">
+                <p style="margin-bottom:0.5rem;color:var(--text-secondary)">CLABE:</p>
+                <p style="font-size:1.5rem;font-weight:bold">722969010056604160</p>
+                <p style="font-size:0.9rem;color:var(--text-secondary)">(JL Molina)</p>
+                <button onclick="navigator.clipboard.writeText('722969010056604160')" style="background:#22c55e;border:none;color:#fff;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;margin-top:0.5rem;font-size:0.9rem">📋 Copiar CLABE</button>
+            </div>
+            <p class="success-instrucciones">📱 <strong>Próximo paso:</strong> Envía tu captura de pago por WhatsApp</p>
+            <button onclick="enviarCapturaDeposito()" class="btn-whatsapp">
+                <svg viewBox="0 0 24 24" class="whatsapp-icon"><path fill="white" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>                ENVIAR CAPTURA DE PAGO
+            </button>
+            <button class="btn btn-secondary" onclick="cerrarDepositoModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="modal" id="buscarQuinielaModal">
+        <div class="modal-content success-content">
+            <div class="modal-glow"></div>
+            <div class="success-icon">🔍</div>
+            <h3 style="font-size:1.8rem;margin-bottom:0.5rem">Tu Quiniela</h3>
+            <div id="resultadoBusqueda" style="text-align:center"></div>
+            <button class="btn btn-secondary" onclick="cerrarBuscarModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="modal" id="pagoModal">
+        <div class="modal-content success-content">
+            <div class="modal-glow"></div>
+            <div class="success-icon">💳</div>
+            <h3 style="font-size:1.8rem;margin-bottom:0.5rem">Datos de Depósito</h3>
+            <div style="background:var(--gray-100);padding:1rem;border-radius:10px;margin:1rem 0;text-align:center">
+                <p style="margin-bottom:0.5rem;color:var(--text-secondary)">Banco:</p>
+                <p style="font-size:1.3rem;font-weight:bold">Mercado Libre</p>
+            </div>
+            <div style="background:var(--gray-100);padding:1rem;border-radius:10px;margin:1rem 0;text-align:center">
+                <p style="margin-bottom:0.5rem;color:var(--text-secondary)">CLABE:</p>
+                <p style="font-size:1.5rem;font-weight:bold">722969010056604160</p>
+                <p style="font-size:0.9rem;color:var(--text-secondary)">(JL Molina)</p>
+                <button onclick="navigator.clipboard.writeText('722969010056604160'); Toast.success('✅ CLABE copiada al portapapeles')" style="background:#22c55e;border:none;color:#fff;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;margin-top:0.5rem;font-size:0.9rem">📋 Copiar CLABE</button>
+            </div>
+            <button class="btn btn-secondary" onclick="cerrarPagoModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="modal" id="appModal">
+        <div class="modal-content" style="max-width:500px">
+            <div class="modal-glow"></div>
+            <button class="modal-close" onclick="cerrarAppModal()">✕</button>
+            <div style="text-align:center">
+                <div style="font-size:4rem;margin-bottom:1rem">📱</div>
+                <h3 style="font-size:1.5rem;margin-bottom:0.5rem;color:#22c55e">App Oficial Treebolito</h3>
+                <p style="color:var(--text-secondary);margin-bottom:1.5rem">Sigue estos pasos para instalar la app:</p>
+            </div>
+            <div style="text-align:left;background:var(--gray-100);padding:1.5rem;border-radius:15px">
+                <div style="display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start">
+                    <span style="background:#22c55e;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0">1</span>
+                    <div>
+                        <strong>📥 Descarga el archivo</strong>
+                        <p style="color:var(--text-secondary);margin-top:0.25rem;font-size:0.9rem">Presiona el botón "Descargar App" abaixo</p>
+                    </div>
+                </div>
+                <div style="display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start">
+                    <span style="background:#22c55e;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0">2</span>
+                    <div>
+                        <strong>⚙️ Permite fuentes desconocidas</strong>
+                        <p style="color:var(--text-secondary);margin-top:0.25rem;font-size:0.9rem">Ve a Ajustes → Seguridad → Fuentes desconocidas → Permitir</p>
+                    </div>
+                </div>
+                <div style="display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start">
+                    <span style="background:#22c55e;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0">3</span>
+                    <div>
+                        <strong>📁 Instala el archivo</strong>
+                        <p style="color:var(--text-secondary);margin-top:0.25rem;font-size:0.9rem">Abre el archivo descargado desde "Descargas" o "Downloads"</p>
+                    </div>
+                </div>
+                <div style="display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start">
+                    <span style="background:#22c55e;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0">4</span>
+                    <div>
+                        <strong>✅ ¡Listo!</strong>
+                        <p style="color:var(--text-secondary);margin-top:0.25rem;font-size:0.9rem">Abre la app y disfruta de Quiniela Treebolito</p>
+                    </div>
+                </div>
+            </div>
+            <a href="app/Quiniela-treebolito.apk" download onclick="cerrarAppModal()" class="btn" style="display:block;text-align:center;margin-top:1.5rem;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;text-decoration:none;padding:1rem;border-radius:10px;font-weight:bold">
+                📥 Descargar App (.apk)
+            </a>
+            <p style="color:var(--text-secondary);font-size:0.8rem;text-align:center;margin-top:0.75rem">Solo disponible para dispositivos Android</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">☘ Quiniela Treebolito</div>
+            <div class="footer-links">
+                <a href="#quiniela">Quiniela</a>
+                <a href="reglas.html">Reglas</a>
+            </div>
+            <p class="footer-copy">© 2026 Quiniela Treebolito. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="app.js"></script>
+<!-- Redes Sociales Flotantes -->
+<div class="social-float">
+    <a href="https://www.facebook.com/profile.php?id=61574437481080" target="_blank" class="social-btn" title="Facebook"><img src="img/facebook.png" alt="Facebook"></a>
+    <a href="https://www.tiktok.com/@sorteos.treebolito" target="_blank" class="social-btn" title="TikTok"><img src="img/tik-tok.png" alt="TikTok"></a>
+    <a href="https://www.instagram.com/sorteostreebolito?igsh=a2Q0ZW52aW5mbXVz" target="_blank" class="social-btn" title="Instagram"><img src="img/instagram.png" alt="Instagram"></a>
+    <a href="https://wa.me/524741482078" target="_blank" class="social-btn" title="WhatsApp"><img src="img/whatsapp.png" alt="WhatsApp"></a>
+</div>
+
+</body>
+
+</html>
